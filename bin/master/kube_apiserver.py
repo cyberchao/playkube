@@ -94,6 +94,6 @@ systemctl enable kube-apiserver
         if subprocess.getoutput(f"ssh root@{ip} 'systemctl status kube-apiserver |grep running|wc -l'") == '1':
             Msg.success(f"kube-apiserver start success [{ip}]")
             continue
-        else:
-            Msg.fail(f"kube-apiserver start fail [{ip}]")
+
+        Msg.fail(f"kube-apiserver start fail [{ip}]")
     Msg.warn('End install kube-apiserver ')

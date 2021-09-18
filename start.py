@@ -1,3 +1,4 @@
+import sys
 import time
 from bin.local.init import init
 from bin.ca import gen_etcd_json
@@ -16,45 +17,80 @@ from bin.tools.color import Msg
 import yaml
 from yaml.loader import SafeLoader
 
-with open('config.yaml') as f:
-    data = yaml.load(f, Loader=SafeLoader)
 
-etcd_hosts = data['etcd']['hosts'].split(' ')
-kube_apiserver_hosts = data['kube-master']['kube-apiserver']['hosts'].split(
-    ' ')
-kube_controller_manager_hosts = data['kube-master']['kube-controller-manager']['hosts'].split(
-    ' ')
-kube_scheduler_hosts = data['kube-master']['kube-scheduler']['hosts'].split(
-    ' ')
-kube_node_hosts = data['kube-node']['hosts'].split(' ')
-kube_apiserver_url = data['kube-apiserver-url']['url']
+class Config:
+    global kube_apiserver_hosts
+    global kube_controller_manager_hosts
+    global kube_scheduler_hosts
+    global kube_node_hosts
+    global kube_apiserver_url
+    global all_hosts
 
-all_hosts = etcd_hosts + kube_apiserver_hosts + \
-    kube_controller_manager_hosts + kube_scheduler_hosts + kube_node_hosts
 
-all_hosts = set(all_hosts)
+def configparser():
+    with open('config.yaml') as f:
+        data = yaml.load(f, Loader=SafeLoader)
 
-master = ['10.0.0.21', '10.0.0.22', '10.0.0.23']
+    Config.etcd_hosts = data['etcd']['hosts'].split(' ')
+    Config.kube_apiserver_hosts = data['kube-master']['kube-apiserver']['hosts'].split(
+        ' ')
+    Config.kube_controller_manager_hosts = data['kube-master']['kube-controller-manager']['hosts'].split(
+        ' ')
+    Config.kube_scheduler_hosts = data['kube-master']['kube-scheduler']['hosts'].split(
+        ' ')
+    Config.kube_node_hosts = data['kube-node']['hosts'].split(' ')
+    Config.kube_apiserver_url = data['kube-apiserver-url']['url']
 
-if __name__ == "__main__":
+    Config.all_hosts = set(Config.etcd_hosts + Config.kube_apiserver_hosts +
+                           Config.kube_controller_manager_hosts +
+                           Config.kube_scheduler_hosts + Config.kube_node_hosts)
+
+
+def cluster():
+    # 集群安装
     Msg.warn("Kubernetes Cluster Installation Start...\n\n")
-    start = time.time()
     init()
-    for ip in all_hosts:
+    for ip in Config.all_hosts:
         system_init(ip)
-    gen_etcd_json(etcd_hosts)
-    gen_apiserver_json(kube_apiserver_hosts)
+    gen_etcd_json(Config.etcd_hosts)
+    gen_apiserver_json(Config.kube_apiserver_hosts)
     gen_cert()
-    etcd(etcd_hosts)
-    docker(kube_node_hosts)
-    apiserver(kube_apiserver_hosts)
-    controller_manager(kube_controller_manager_hosts, kube_apiserver_url)
-    scheduler(kube_scheduler_hosts, kube_apiserver_url)
-    admin(kube_apiserver_hosts, kube_apiserver_url)
+    etcd(Config.etcd_hosts)
+    docker(Config.kube_node_hosts)
+    apiserver(Config.kube_apiserver_hosts)
+    controller_manager(Config.kube_controller_manager_hosts,
+                       Config.kube_apiserver_url)
+    scheduler(Config.kube_scheduler_hosts, Config.kube_apiserver_url)
+    admin(Config.kube_apiserver_hosts, Config.kube_apiserver_url)
 
-    for ip in kube_node_hosts:
-        kubelet(ip, kube_apiserver_url)
-        proxy(ip, kube_apiserver_url)
+    scale(Config.kube_node_hosts)
+    Msg.success("Kubernetes install finished")
 
-    Msg.success("Kubernetes install finished, cost time:" +
-                str(time.time()-start))
+
+def scale(node_list):
+    # node扩容
+    for ip in node_list:
+        kubelet(ip, Config.kube_apiserver_url)
+        proxy(ip, Config.kube_apiserver_url)
+        Msg.success(f"Node scale success [{ip}]")
+
+
+def main():
+    arg = sys.argv[1]
+    configparser()
+    if arg:
+        if arg.split('=')[0] == '-n':
+            Msg.warn('Start Node scale')
+            node_list = arg.split('=')[1].split(',')
+            scale(node_list)
+            Msg.warn('End Node scale')
+        else:
+            Msg.fail('args error')
+    else:
+        cluster()
+
+
+if __name__ == '__main__':
+    start = time.time()
+    main()
+    Msg.warn("Finished, Spend time:" + str(time.time()-start))
