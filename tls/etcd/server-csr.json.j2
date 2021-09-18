@@ -1,0 +1,18 @@
+{
+    "CN": "etcd",
+    "hosts": [
+	{% for ip in master %}	
+	"{{ ip }}"{% if not loop.last %},{% endif %}{% endfor %}
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CN",
+            "L": "Shanghai",
+            "ST": "Shanghai"
+        }
+    ]
+}
