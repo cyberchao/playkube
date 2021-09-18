@@ -64,6 +64,7 @@ systemctl enable etcd
                 scp tls/etcd/ca*pem tls/etcd/server*pem root@{ip}:/opt/etcd/ssl/
                 ssh root@{ip} '{conf.replace('{ip}',ip)}'
                 '''
-        subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.getoutput(cmd)
+        # subprocess.Popen(
+        #    cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     Msg.warn(f'End install etcd')

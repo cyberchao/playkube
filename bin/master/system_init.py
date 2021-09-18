@@ -15,6 +15,8 @@ def system_init(ip):
         Msg.fail(f"{ip}:init fail:{output}")
 
     cmd = r'''# 关闭防火墙
+yum install -y ntp
+ntpdate pool.ntp.org
 systemctl stop firewalld
 systemctl disable firewalld
 setenforce 0
