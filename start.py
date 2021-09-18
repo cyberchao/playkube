@@ -53,7 +53,8 @@ if __name__ == "__main__":
     admin(kube_apiserver_hosts, kube_apiserver_url)
 
     for ip in kube_node_hosts:
-        kubelet(ip,kube_apiserver_url)
-        proxy(ip,kube_apiserver_url)
+        kubelet(ip, kube_apiserver_url)
+        proxy(ip, kube_apiserver_url)
 
-    Msg.success("Kubernetes install finished, cost time:" + time.time()-start)
+    Msg.success("Kubernetes install finished, cost time:" +
+                str(time.time()-start))

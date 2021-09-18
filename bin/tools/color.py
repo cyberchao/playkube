@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 
 class Msg:
@@ -15,9 +16,9 @@ class Msg:
     @classmethod
     def warn(cls, msg):
         if 'End' in msg:
-            print(cls.WARNING+msg+cls.ENDC+'\n\n')
+            print(cls.WARNING+msg+cls.ENDC+'---'+datetime.now()+'\n\n')
         else:
-            print(cls.WARNING+msg+cls.ENDC)
+            print(cls.WARNING+msg+cls.ENDC+'---'+datetime.now())
 
     @classmethod
     def success(cls, msg):
@@ -25,5 +26,5 @@ class Msg:
 
     @classmethod
     def fail(cls, msg):
-        print(cls.FAIL+msg+cls.ENDC)
+        print(cls.FAIL+msg+cls.ENDC+'---'+datetime.now())
         sys.exit(1)
