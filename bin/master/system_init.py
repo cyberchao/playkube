@@ -15,6 +15,7 @@ def system_init(ip):
         Msg.fail(f"{ip}:init fail:{output}")
 
     cmd = r'''# 关闭防火墙
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 yum install -y ntp
 ntpdate pool.ntp.org
 systemctl stop firewalld
