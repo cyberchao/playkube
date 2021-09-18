@@ -3,7 +3,7 @@ import sys
 from bin.tools.color import Msg
 
 
-def proxy(ip):
+def proxy(ip, kube_apiserver_url):
     Msg.warn("Start install kube-proxy "+"="*20)
     status, output = subprocess.getstatusoutput(
         f"scp tls/k8s/proxy/kube*.pem root@{ip}:/opt/kubernetes/proxy")
@@ -38,7 +38,7 @@ EOF
 kubectl config set-cluster kubernetes \
   --certificate-authority=/opt/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server=https://10.0.0.22:6443 \
+  --server={kube_apiserver_url} \
   --kubeconfig=/opt/kubernetes/cfg/kube-proxy.kubeconfig
 kubectl config set-credentials kube-proxy \
   --client-certificate=/opt/kubernetes/proxy/kube-proxy.pem \

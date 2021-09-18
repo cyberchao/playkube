@@ -3,20 +3,29 @@ import sys
 from bin.tools.color import Msg
 
 
-def apiserver(master):
+def apiserver(hosts):
     Msg.warn('Start install kube-apiserver ' + '='*20)
     urls = list()
-    for ip in master:
+    for ip in hosts:
         urls.append(f'https://{ip}:2379')
     etcd_servers = ','.join(urls)
 
-    for ip in master:
-        status, out = subprocess.getstatusoutput(
-            f"scp pkgs/kubernetes/server/bin/{{kube-apiserver,kube-scheduler,kube-controller-manager}} root@{ip}:/opt/kubernetes/bin")
-        subprocess.getstatusoutput(
+    for ip in hosts:
+        status, output = subprocess.getstatusoutput(
+            f"scp pkgs/kubernetes/server/bin/kube-apiserver root@{ip}:/opt/kubernetes/bin")
+        if status != 0:
+            Msg.fail(
+                f"scp  pkgs/kubernetes/server/bin/kube-apiserver error [{ip}]:{output}")
+        status, output = subprocess.getstatusoutput(
             f"scp pkgs/kubernetes/server/bin/kubectl root@{ip}:/usr/local/bin/")
-        subprocess.getstatusoutput(
+        if status != 0:
+            Msg.fail(
+                f"scp  pkgs/kubernetes/server/bin/kubectl error [{ip}]:{output}")
+        status, output = subprocess.getstatusoutput(
             f"scp tls/k8s/ca*pem tls/k8s/apiserver/server*pem root@{ip}:/opt/kubernetes/ssl/")
+        if status != 0:
+            Msg.fail(
+                f"scp tls/k8s/ca*pem tls/k8s/apiserver/server*pem error [{ip}]:{output}")
         cmd = f'''
 cat > /opt/kubernetes/cfg/kube-apiserver.conf << EOF
 KUBE_APISERVER_OPTS="--logtostderr=false \\

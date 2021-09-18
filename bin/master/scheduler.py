@@ -3,9 +3,14 @@ import sys
 from bin.tools.color import Msg
 
 
-def scheduler(master):
+def scheduler(hosts, kube_apiserver_url):
     Msg.warn('Start install kube-scheduler ' + '='*20)
-    for ip in master:
+    for ip in hosts:
+        status, output = subprocess.getstatusoutput(
+            f"scp pkgs/kubernetes/server/bin/kube-scheduler root@{ip}:/opt/kubernetes/bin")
+        if status != 0:
+            Msg.fail(
+                f"scp  pkgs/kubernetes/server/bin/kube-scheduler error [{ip}]:{output}")
         status, output = subprocess.getstatusoutput(
             f"scp tls/k8s/scheduler/kube*.pem root@{ip}:/opt/kubernetes/scheduler")
         if status != 0:
@@ -23,7 +28,7 @@ EOF
 kubectl config set-cluster kubernetes \
   --certificate-authority=/opt/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server=https://{ip}:6443 \
+  --server={kube_apiserver_url} \
   --kubeconfig=/opt/kubernetes/cfg/kube-scheduler.kubeconfig
 kubectl config set-credentials kube-scheduler \
   --client-certificate=/opt/kubernetes/scheduler/kube-scheduler.pem \

@@ -3,9 +3,14 @@ import sys
 from bin.tools.color import Msg
 
 
-def controller_manager(master):
+def controller_manager(hosts, kube_apiserver_url):
     Msg.warn('Start install kube-controller-manager ' + '='*20)
-    for ip in master:
+    for ip in hosts:
+        status, output = subprocess.getstatusoutput(
+            f"scp pkgs/kubernetes/server/bin/kube-controller-manager root@{ip}:/opt/kubernetes/bin")
+        if status != 0:
+            Msg.fail(
+                f"scp  pkgs/kubernetes/server/bin/kube-controller-manager error [{ip}]:{output}")
         status, output = subprocess.getstatusoutput(
             f"scp tls/k8s/controller-manager/kube*.pem root@{ip}:/opt/kubernetes/controller")
         if status != 0:
@@ -30,7 +35,7 @@ EOF
 kubectl config set-cluster kubernetes \
   --certificate-authority=/opt/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server=https://{ip}:6443 \
+  --server={kube_apiserver_url} \
   --kubeconfig=/opt/kubernetes/cfg/kube-controller-manager.kubeconfig
 kubectl config set-credentials kube-controller-manager \
   --client-certificate=/opt/kubernetes/controller/kube-controller-manager.pem \

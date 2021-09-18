@@ -4,13 +4,15 @@ from jinja2 import Template
 from bin.tools.color import Msg
 
 
-def gen_json(master):
+def gen_etcd_json(master):
     with open('tls/etcd/server-csr.json.j2') as f:
         template = Template(f.read())
         content = template.render(master=master)
         with open('tls/etcd/server-csr.json', 'w') as m:
             m.write(content)
 
+
+def gen_apiserver_json(master):
     with open('tls/k8s/apiserver/apiserver-csr.json.j2') as f:
         template = Template(f.read())
         content = template.render(master=master)
@@ -18,11 +20,9 @@ def gen_json(master):
             m.write(content)
 
 
-def gen_cert(master):
+def gen_cert():
     Msg.warn("Start gen cert"+"="*20)
-    subprocess.getoutput(
-        "find tls/ ! -name '*.json*' -type f |xargs rm -f")
-    gen_json(master)
+
     cwd = os.getcwd()
     gen_cmd = f'''
             cd {cwd}/tls/etcd/;cfssl gencert -initca ca-csr.json | cfssljson -bare ca -  

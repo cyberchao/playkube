@@ -3,7 +3,7 @@ import sys
 from bin.tools.color import Msg
 
 
-def admin(master):
+def admin(master, kube_apiserver_url):
     Msg.warn('Start install kubeconfig ' + '='*20)
     for ip in master:
         status, output = subprocess.getstatusoutput(
@@ -15,7 +15,7 @@ def admin(master):
               kubectl config set-cluster kubernetes \
                 --certificate-authority=/opt/kubernetes/ssl/ca.pem \
                 --embed-certs=true \
-                --server=https://{ip}:6443 \
+                --server={kube_apiserver_url} \
                 --kubeconfig=/root/.kube/config
               kubectl config set-credentials cluster-admin \
                 --client-certificate=/opt/kubernetes/admin/admin.pem \

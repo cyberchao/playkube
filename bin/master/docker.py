@@ -3,7 +3,7 @@ import sys
 from bin.tools.color import Msg
 
 
-def docker(master):
+def docker(hosts):
     Msg.warn('Start install docker ' + '='*20)
     cmd = '''
 cat > /usr/lib/systemd/system/docker.service << EOF
@@ -34,7 +34,7 @@ systemctl start docker
 systemctl enable docker
 
 '''
-    for ip in master:
+    for ip in hosts:
         subprocess.getstatusoutput(
             f"scp pkgs/docker/* root@{ip}:/usr/bin")
         status, output = subprocess.getstatusoutput(f"ssh root@{ip} '{cmd}'")

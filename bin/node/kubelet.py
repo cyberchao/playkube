@@ -3,7 +3,7 @@ import sys
 from bin.tools.color import Msg
 
 
-def kubelet(ip):
+def kubelet(ip, kube_apiserver_url):
     Msg.warn("start install kubelet "+"="*20)
     subprocess.getoutput(
         f"ssh root@{ip} 'mkdir -p /opt/kubernetes/{{proxy,bin,cfg,ssl,logs}}'")
@@ -62,7 +62,7 @@ EOF
 kubectl config set-cluster kubernetes \
   --certificate-authority=/opt/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server=https://{ip}:6443 \
+  --server={kube_apiserver_url} \
   --kubeconfig=/opt/kubernetes/cfg/bootstrap.kubeconfig
 kubectl config set-credentials "kubelet-bootstrap" \
   --token=c47ffb939f5ca36231d9e3121a252940 \

@@ -7,19 +7,19 @@ ETCDCTL_API=3 /opt/etcd/bin/etcdctl --cacert=/opt/etcd/ssl/ca.pem --cert=/opt/et
 '''
 
 
-def etcd(master):
+def etcd(hosts):
     Msg.warn('Start install etcd ' + '='*20)
     urls = list()
-    for ip in master:
-        urls.append(f'etcd-{master.index(ip)+1}=https://{ip}:2380')
+    for ip in hosts:
+        urls.append(f'etcd-{hosts.index(ip)+1}=https://{ip}:2380')
     cluster = ','.join(urls)
-    for ip in master:
+    for ip in hosts:
         conf = f'''
 rm -rf /var/lib/etcd/default.etcd
 # etcd.conf
 cat > /opt/etcd/cfg/etcd.conf << EOF
 #[Member]
-ETCD_NAME="etcd-{master.index(ip)+1}"
+ETCD_NAME="etcd-{hosts.index(ip)+1}"
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 ETCD_LISTEN_PEER_URLS="https://{ip}:2380"
 ETCD_LISTEN_CLIENT_URLS="https://{ip}:2379"
@@ -64,5 +64,6 @@ systemctl enable etcd
                 scp tls/etcd/ca*pem tls/etcd/server*pem root@{ip}:/opt/etcd/ssl/
                 ssh root@{ip} '{conf.replace('{ip}',ip)}'
                 '''
-        subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     Msg.warn(f'End install etcd')

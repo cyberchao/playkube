@@ -1,0 +1,28 @@
+etcd:
+  hosts:
+    10.0.0.21
+    10.0.0.22
+    10.0.0.23
+kube-master:
+  kube-apiserver:
+    hosts:
+      10.0.0.21
+      10.0.0.22
+      10.0.0.23
+  kube-controller-manager:
+    hosts:
+      10.0.0.21
+      10.0.0.22
+      10.0.0.23
+  kube-scheduler:
+    hosts:
+      10.0.0.21
+      10.0.0.22
+      10.0.0.23
+kube-apiserver-url:
+  url:
+    https://10.0.0.22:6443
+kube-node:
+  hosts:
+    10.0.0.22
+  
