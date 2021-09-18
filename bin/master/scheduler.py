@@ -6,11 +6,8 @@ from bin.tools.color import Msg
 def scheduler(hosts, kube_apiserver_url):
     Msg.warn('Start install kube-scheduler ' + '='*20)
     for ip in hosts:
-        status, output = subprocess.getstatusoutput(
+        subprocess.getstatusoutput(
             f"scp pkgs/kubernetes/server/bin/kube-scheduler root@{ip}:/opt/kubernetes/bin")
-        if status != 0:
-            Msg.fail(
-                f"scp  pkgs/kubernetes/server/bin/kube-scheduler error [{ip}]:{output}")
         status, output = subprocess.getstatusoutput(
             f"scp tls/k8s/scheduler/kube*.pem root@{ip}:/opt/kubernetes/scheduler")
         if status != 0:

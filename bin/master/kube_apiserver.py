@@ -11,11 +11,8 @@ def apiserver(hosts):
     etcd_servers = ','.join(urls)
 
     for ip in hosts:
-        status, output = subprocess.getstatusoutput(
+        subprocess.getoutput(
             f"scp pkgs/kubernetes/server/bin/kube-apiserver root@{ip}:/opt/kubernetes/bin")
-        if status != 0:
-            Msg.fail(
-                f"scp  pkgs/kubernetes/server/bin/kube-apiserver error [{ip}]:{output}")
         status, output = subprocess.getstatusoutput(
             f"scp pkgs/kubernetes/server/bin/kubectl root@{ip}:/usr/local/bin/")
         if status != 0:

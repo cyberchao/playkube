@@ -16,9 +16,9 @@ class Msg:
     @classmethod
     def warn(cls, msg):
         if 'End' in msg:
-            print(cls.WARNING+msg+cls.ENDC+'---'+str(datetime.now())+'\n\n')
+            print(cls.WARNING+msg+cls.ENDC+'('+str(datetime.now())+')\n\n')
         else:
-            print(cls.WARNING+msg+cls.ENDC+'---'+str(datetime.now()))
+            print(cls.WARNING+msg+cls.ENDC+'('+str(datetime.now())+')')
 
     @classmethod
     def success(cls, msg):
@@ -26,5 +26,5 @@ class Msg:
 
     @classmethod
     def fail(cls, msg):
-        print(cls.FAIL+msg+cls.ENDC+'---'+str(datetime.now()))
+        print(cls.FAIL+msg+cls.ENDC+'('+str(datetime.now())+')')
         sys.exit(1)

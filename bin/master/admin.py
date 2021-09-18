@@ -10,7 +10,6 @@ def admin(master, kube_apiserver_url):
             f"scp tls/k8s/admin/admin*pem root@{ip}:/opt/kubernetes/admin/")
         if status != 0:
             Msg.fail(f"scp admin.pem fail [{ip}]:{output}")
-            sys.exit(1)
         cmd = f'''
               kubectl config set-cluster kubernetes \
                 --certificate-authority=/opt/kubernetes/ssl/ca.pem \
@@ -35,6 +34,6 @@ def admin(master, kube_apiserver_url):
         if status != 0:
             if "\"kubelet-bootstrap\" already exists" not in output:
                 Msg.fail(f"install kubeconfig fail [{ip}]:{output}")
-                sys.exit(1)
+
         Msg.success(f'install kubeconfig ok [{ip}]' + '='*20)
-    Msg.warn('kubeconfig OK ' + '='*20)
+    Msg.warn('End set kubeconfig ')

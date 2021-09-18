@@ -37,7 +37,7 @@ all_hosts = set(all_hosts)
 master = ['10.0.0.21', '10.0.0.22', '10.0.0.23']
 
 if __name__ == "__main__":
-    Msg.warn("Kubernetes Cluster Installation Start...\n")
+    Msg.warn("Kubernetes Cluster Installation Start...\n\n")
     start = time.time()
     init()
     for ip in all_hosts:
