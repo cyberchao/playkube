@@ -8,6 +8,11 @@ def kubelet(ip, kube_apiserver_url):
     subprocess.getoutput(
         f"ssh root@{ip} 'mkdir -p /opt/kubernetes/{{proxy,bin,cfg,ssl,logs}}'")
     status, output = subprocess.getstatusoutput(
+        f"scp pkgs/kubernetes/server/bin/kubectl root@{ip}:/usr/local/bin/")
+    if status != 0:
+        Msg.fail(
+            f"scp  pkgs/kubernetes/server/bin/kubectl error [{ip}]:{output}")
+    status, output = subprocess.getstatusoutput(
         f"scp tls/k8s/ca*pem tls/k8s/apiserver/server*pem root@{ip}:/opt/kubernetes/ssl/")
     if status != 0:
         Msg.fail(

@@ -1,6 +1,6 @@
 import sys
 import time
-from bin.local.init import init
+from bin.local.init import init, PreInstall
 from bin.ca import gen_etcd_json
 from bin.ca import gen_apiserver_json
 from bin.ca import gen_cert
@@ -28,6 +28,7 @@ class Config:
     global kube_node_hosts
     global kube_apiserver_url
     global all_hosts
+    global root_pass
 
 
 def configparser():
@@ -47,13 +48,16 @@ def configparser():
     Config.all_hosts = set(Config.etcd_hosts + Config.kube_apiserver_hosts +
                            Config.kube_controller_manager_hosts +
                            Config.kube_scheduler_hosts + Config.kube_node_hosts)
-
+    Config.root_pass = data['other-conf']['root_pass']
 
 def cluster():
     # 集群安装
     Msg.warn("Kubernetes Cluster Installation Start...\n\n")
     init()
+    PreInstall.create_id()
     for ip in Config.all_hosts:
+        obj = PreInstall(server=ip, rootpass=Config.root_pass)
+        obj.ssh_nopass()
         system_init(ip)
     gen_etcd_json(Config.etcd_hosts)
     gen_apiserver_json(Config.kube_apiserver_hosts)
@@ -76,7 +80,7 @@ def cluster():
 
 def scale(node_list):
     # node扩容
-    admin(node_list, Config.kube_apiserver_url)
+    # admin(node_list, Config.kube_apiserver_url)
     for ip in node_list:
         docker([ip])
 
