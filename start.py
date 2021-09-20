@@ -13,6 +13,9 @@ from bin.master.scheduler import scheduler
 from bin.master.admin import admin
 from bin.node.kubelet import kubelet
 from bin.node.proxy import proxy
+from bin.master.approve import approve
+from bin.master.calico import calico
+from bin.master.coredns import coredns
 from bin.tools.color import Msg
 import yaml
 from yaml.loader import SafeLoader
@@ -28,7 +31,7 @@ class Config:
 
 
 def configparser():
-    with open('config.yaml') as f:
+    with open('config.yml') as f:
         data = yaml.load(f, Loader=SafeLoader)
 
     Config.etcd_hosts = data['etcd']['hosts'].split(' ')
@@ -56,7 +59,7 @@ def cluster():
     gen_apiserver_json(Config.kube_apiserver_hosts)
     gen_cert()
     etcd(Config.etcd_hosts)
-    docker(Config.kube_node_hosts)
+    # docker(Config.kube_node_hosts)
     apiserver(Config.kube_apiserver_hosts)
     controller_manager(Config.kube_controller_manager_hosts,
                        Config.kube_apiserver_url)
@@ -64,19 +67,28 @@ def cluster():
     admin(Config.kube_apiserver_hosts, Config.kube_apiserver_url)
 
     scale(Config.kube_node_hosts)
+
+    approve(Config.kube_apiserver_hosts[0])
+    calico(Config.kube_apiserver_hosts[0])
+    coredns(Config.kube_apiserver_hosts[0])
     Msg.success("Kubernetes install finished")
 
 
 def scale(node_list):
     # node扩容
     for ip in node_list:
+        docker([ip])
         kubelet(ip, Config.kube_apiserver_url)
         proxy(ip, Config.kube_apiserver_url)
         Msg.success(f"Node scale success [{ip}]")
+    approve(Config.kube_apiserver_hosts[0])
 
 
 def main():
-    arg = sys.argv[1]
+    try:
+        arg = sys.argv[1]
+    except:
+        arg = ''
     configparser()
     if arg:
         if arg.split('=')[0] == '-n':

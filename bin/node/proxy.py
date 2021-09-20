@@ -32,7 +32,7 @@ metricsBindAddress: 0.0.0.0:10249
 clientConnection:
   kubeconfig: /opt/kubernetes/cfg/kube-proxy.kubeconfig
 hostnameOverride: {ip}
-clusterCIDR: 10.0.0.0/24
+clusterCIDR: 10.244.0.0/16
 EOF
 
 kubectl config set-cluster kubernetes \

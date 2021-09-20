@@ -65,6 +65,7 @@ systemctl enable etcd
                 ssh root@{ip} '{conf.replace('{ip}',ip)}'
                 '''
         subprocess.getoutput(cmd)
+        Msg.success(f'etcd install ok [{ip}]')
         # subprocess.Popen(
         #    cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     Msg.warn(f'End install etcd')
