@@ -76,8 +76,10 @@ def cluster():
 
 def scale(node_list):
     # node扩容
+    admin(node_list, Config.kube_apiserver_url)
     for ip in node_list:
         docker([ip])
+
         kubelet(ip, Config.kube_apiserver_url)
         proxy(ip, Config.kube_apiserver_url)
         Msg.success(f"Node scale success [{ip}]")
